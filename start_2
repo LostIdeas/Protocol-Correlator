@@ -1,0 +1,58 @@
+
+
+import os
+from subprocess import Popen, PIPE
+global tmp
+
+#Run wireshark using the IMSI as filter and displaying the sequence number and recording in a variable, and then splitting in a list
+
+def main():
+	final=[]
+	tmp=[]
+	for filename in os.listdir('/home/pi/tshark'):
+     #callthecommandhere(blablahbla, filename, foo)
+		y = "/home/pi/tshark/"+filename
+		(stdout, stderr) = Popen(['tshark','-r',y,'-t','ud','-T','fields','-e','gtp.seq_number','-Y','e212.imsi == 204043740503899'], stdout=PIPE).communicate()
+
+		tmp.append(stdout)
+	
+	#for i in tmp:
+	#	final=final + i.splitlines()
+	#print final 
+
+
+
+	for filename in os.listdir('/home/pi/tshark'):
+		cnt=0
+		y = "/home/pi/tshark/"+filename
+		for k in tmp:
+			for i,j in enumerate(k.splitlines()):
+				t = "gtp.seq_number == " + j
+				s = "/home/pi/out/"+filename+str(i)+".pcap"
+				(stdout, stderr) = Popen(['tshark','-r',y,'-t','ud','-w',s,'-Y',t], stdout=PIPE).communicate() 
+
+	
+
+
+
+
+	
+
+#for j,i in enumerate(a):
+#	t = "gtp.seq_number == " + i
+#	s = "/home/pi/tshark/"+str(j)+".pcap"
+#	
+#	#(stdout, stderr) = Popen(['tshark','-r','/home/pi/tshark/test.pcapng','-t','ud','-Y',t], stdout=PIPE).communicate()
+#	(stdout, stderr) = Popen(['tshark','-r','/home/pi/tshark/test.pcapng','-t','ud','-w',s,'-Y',t], stdout=PIPE).communicate()
+#for j,i in enumerate(a):
+#        z = "/home/pi/tshark/"+str(j)+".pcap"
+#	(stdout, stderr) = Popen(['mergecap','-w','/home/pi/tshark/final.pcapng',z], stdout=PIPE).communicate()
+#
+#for j,i in enumerate(a):
+#	x = "/home/pi/tshark/"+str(j)+".pcap"
+#	(stdout, stderr) = Popen(['rm',x], stdout=PIPE).communicate()
+
+
+
+if __name__ == '__main__':
+    main()
